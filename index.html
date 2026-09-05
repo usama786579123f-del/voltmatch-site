@@ -244,13 +244,30 @@
 
   <section class="info-section" id="guides">
     <h2>Battery Buying Guides</h2>
-    <p>Practical, model-specific guides so you never guess before you buy a replacement pack.</p>
+    <p>Practical, model-specific guides so you never guess before you buy a replacement pack. Click any guide to read the full article.</p>
     <div class="guide-grid">
-      <div class="guide-card"><img src="images/charger-icon.png" alt="Charger" class="g-icon-img"><h4>How to read your charger label</h4><p>Your charger's output voltage tells you your battery's real voltage family — here's how to find and read it.</p></div>
-      <div class="guide-card"><div class="g-icon">🧯</div><h4>Battery safety basics</h4><p>Why mismatched voltage or connector types can cause fire risk, and how to avoid it.</p></div>
-      <div class="guide-card"><div class="g-icon">🔋</div><h4>Third-party vs OEM packs</h4><p>When a third-party battery is a safe swap, and when to stick with the original brand.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('charger-label')"><img src="images/charger-icon.png" alt="Charger" class="g-icon-img"><h4>How to read your charger label</h4><p>Your charger's output voltage tells you your battery's real voltage family — here's how to find and read it.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('safety-basics')"><div class="g-icon">🧯</div><h4>Battery safety basics</h4><p>Why mismatched voltage or connector types can cause fire risk, and how to avoid it.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('oem-vs-third-party')"><div class="g-icon">🔋</div><h4>Third-party vs OEM packs</h4><p>When a third-party battery is a safe swap, and when to stick with the original brand.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('voltage-families')"><div class="g-icon">⚡</div><h4>36V vs 48V vs 52V explained</h4><p>What these numbers actually mean for speed, range, and which batteries can (and can't) be swapped.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('battery-dying-signs')"><div class="g-icon">📉</div><h4>Signs your battery needs replacing</h4><p>The warning signs most riders ignore until their battery fails completely.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('extend-lifespan')"><div class="g-icon">🔧</div><h4>Extending your battery's lifespan</h4><p>Simple charging and storage habits that can add years to a lithium battery's life.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('watt-hours-explained')"><div class="g-icon">📏</div><h4>Understanding watt-hours and range</h4><p>Why Wh matters more than Ah when comparing battery capacity across brands.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('wrong-charger-risk')"><div class="g-icon">⚠️</div><h4>What happens with the wrong charger</h4><p>The real risks of using a charger that doesn't match your battery's voltage.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('winter-storage')"><div class="g-icon">❄️</div><h4>Storing your battery in winter</h4><p>How cold weather affects lithium batteries, and how to store yours correctly.</p></div>
+      <div class="guide-card" style="cursor:pointer;" onclick="openGuide('connector-types')"><div class="g-icon">🔌</div><h4>Connector types explained</h4><p>XT60, Anderson, T-connectors — why matching connectors matters as much as matching voltage.</p></div>
     </div>
   </section>
+
+  <div id="guideModal" class="modal-overlay">
+    <div class="modal-box legal-box">
+      <div class="modal-head">
+        <h3 id="guideTitle">Guide</h3>
+        <span class="modal-close" onclick="closeGuide()">✕</span>
+      </div>
+      <div id="guideBody" class="legal-body"></div>
+    </div>
+  </div>
 
   <section class="info-section" id="battery101">
     <h2>Battery 101</h2>
@@ -859,6 +876,121 @@ document.getElementById('legalModal').addEventListener('click', (e) => {
 
 // ⚠️ Once your Amazon Associates account is approved, put your tracking ID here (e.g. "yourtag-20")
 const AMAZON_AFFILIATE_TAG = "";
+
+const guideContent = {
+  "charger-label": {
+    title: "How to Read Your Charger Label",
+    html: `<p>Every e-bike or scooter charger has a small label — usually on the underside or on a sticker near the cord — printed with two key numbers: an input rating and an output rating.</p>
+    <p>The <strong>output</strong> line is what matters for battery matching. It looks something like "Output: 54.6V ⎓ 2A". That 54.6V is not your battery's nominal voltage — it's the fully-charged peak voltage, which is always higher than the nominal rating.</p>
+    <p>Here's the quick conversion table:</p>
+    <ul>
+      <li><strong>42V charger</strong> → 36V battery family</li>
+      <li><strong>54.6V charger</strong> → 48V battery family</li>
+      <li><strong>58.8V or 59.9V charger</strong> → 52V battery family</li>
+      <li><strong>84V charger</strong> → 72V battery family</li>
+    </ul>
+    <p>If you've lost your battery's documentation, checking the charger label is the fastest way to confirm which voltage family you're actually on — and it's more reliable than guessing from your bike's marketing name, since manufacturers don't always put the voltage in the model name.</p>`
+  },
+  "safety-basics": {
+    title: "Battery Safety Basics",
+    html: `<p>Lithium-ion batteries — the type used in virtually all modern e-bikes and scooters — are safe when matched correctly, but genuinely dangerous when they're not.</p>
+    <p><strong>The two things that matter most:</strong></p>
+    <ul>
+      <li><strong>Voltage match.</strong> Using a battery with a higher voltage than your controller and motor are rated for can overheat components. Using a lower voltage won't damage anything, but your bike will underperform.</li>
+      <li><strong>Charger match.</strong> Using a charger rated for a different voltage family than your battery is the single most common cause of battery fires in this category. Never assume "it fits the plug, so it must be fine."</li>
+    </ul>
+    <p>Other good habits: never charge a battery unattended overnight, don't charge immediately after a hard ride while the pack is still warm, and stop using any battery that's swollen, punctured, or unusually hot to the touch — these are signs of cell damage that can lead to thermal runaway.</p>
+    <p>When in doubt, a battery that's a genuine question mark is not worth the risk of guessing.</p>`
+  },
+  "oem-vs-third-party": {
+    title: "Third-Party vs OEM Battery Packs",
+    html: `<p>An OEM (Original Equipment Manufacturer) battery is made or officially sold by your bike's brand. A third-party battery is made by an unrelated company but designed to match the same voltage and physical mounting.</p>
+    <p><strong>When a third-party pack is usually fine:</strong> when it matches your exact voltage family, uses the same connector type, and comes from a seller with genuine reviews from owners of your specific model — not just generic "compatible with most e-bikes" marketing.</p>
+    <p><strong>When to stick with OEM:</strong> if your bike is still under warranty (third-party batteries often void it), if you can't find clear connector photos to compare, or if the seller can't tell you the exact cell configuration (like "13S5P" or "10S4P").</p>
+    <p>Price alone isn't a reliable signal — a cheap OEM-brand replacement can be a safer bet than an unbranded pack, even if the unbranded one costs less.</p>`
+  },
+  "voltage-families": {
+    title: "36V vs 48V vs 52V Explained",
+    html: `<p>Voltage is one of two numbers (the other being current, in amps) that together determine how much power a motor can produce. Higher voltage generally means more torque and higher top speed, assuming the controller and motor are rated to handle it.</p>
+    <p><strong>36V</strong> — Common on lighter kick-scooters and entry-level e-bikes. Typically tops out around 15-20 mph.</p>
+    <p><strong>48V</strong> — The most common family for mainstream commuter e-bikes (Rad Power, Aventon, Lectric, Ride1Up). Balances range, speed, and battery weight.</p>
+    <p><strong>52V</strong> — Found on performance-oriented e-bikes (some Super73, Juiced models) where extra torque for hills or cargo hauling matters more than battery size.</p>
+    <p><strong>The critical rule:</strong> these families are not interchangeable just because a battery "fits" physically. A 48V battery on a 36V-rated controller can cause overcurrent damage; a 36V battery on a 48V system will simply underperform. Always match the family your bike was designed for.</p>`
+  },
+  "battery-dying-signs": {
+    title: "Signs Your Battery Needs Replacing",
+    html: `<p>Lithium batteries degrade gradually, and most riders don't notice until the decline is severe. Watch for these signs:</p>
+    <ul>
+      <li><strong>Noticeably shorter range</strong> — if a ride that used to leave you at 40% battery now drains to 10%, the pack's capacity has likely degraded.</li>
+      <li><strong>Voltage sag under load</strong> — power that dips or stutters on hills or acceleration, even with a full charge shown.</li>
+      <li><strong>Faster self-discharge</strong> — losing significant charge just sitting unused for a few days.</li>
+      <li><strong>Physical swelling</strong> — a pack that looks puffed up or won't sit flush anymore should be retired immediately, not just monitored.</li>
+      <li><strong>Charging time changes</strong> — a pack that used to take 4 hours and now takes 6+ for the same charge is showing internal resistance increase, a classic aging sign.</li>
+    </ul>
+    <p>Most e-bike batteries are rated for 500-1000 full charge cycles before capacity drops meaningfully — depending on riding habits, that's typically 3-5 years for a daily commuter.</p>`
+  },
+  "extend-lifespan": {
+    title: "Extending Your Battery's Lifespan",
+    html: `<p>Lithium batteries degrade from chemistry, not just age — and a few habits make a measurable difference over years of use:</p>
+    <ul>
+      <li><strong>Avoid charging to 100% every time.</strong> If your battery or app allows it, charging to 80-90% for daily use and reserving full charges for long rides reduces stress on the cells.</li>
+      <li><strong>Don't let it sit empty.</strong> Storing a battery at 0% for extended periods can push cells into a damaging deep-discharge state.</li>
+      <li><strong>Store around 40-60% charge</strong> if you won't ride for more than a few weeks — this is the ideal resting state for lithium chemistry.</li>
+      <li><strong>Avoid extreme temperatures.</strong> Both charging in freezing cold and storing in direct summer heat accelerate degradation.</li>
+      <li><strong>Use the charger that came with it</strong>, or a verified same-voltage replacement — mismatched charge curves add unnecessary stress.</li>
+    </ul>`
+  },
+  "watt-hours-explained": {
+    title: "Understanding Watt-Hours and Range",
+    html: `<p>When comparing batteries, Ah (amp-hours) alone is misleading because it ignores voltage. Two batteries can both say "14Ah" and have very different actual energy storage if one is 36V and the other is 48V.</p>
+    <p>The number that actually tells you total energy is <strong>Watt-hours (Wh)</strong>, calculated simply as:</p>
+    <p style="font-family:monospace; background:var(--bg); padding:10px 14px; border-radius:8px;">Wh = Voltage × Ah</p>
+    <p>For example, a 48V 14Ah battery stores 672Wh — noticeably more than a 36V 14Ah battery, which only stores 504Wh, despite the identical Ah rating.</p>
+    <p>When shopping for range, always compare Wh, not Ah. A higher-voltage battery with the same Ah number will always store more usable energy, translating to more real-world range.</p>`
+  },
+  "wrong-charger-risk": {
+    title: "What Happens With the Wrong Charger",
+    html: `<p>Chargers aren't universal, and using the wrong one is one of the most common — and most avoidable — causes of battery damage or fire risk in e-bikes and scooters.</p>
+    <p><strong>Using a higher-voltage charger than your battery:</strong> forces the pack to accept more voltage than its protection circuit is designed for. Best case, the battery management system cuts off charging. Worst case, it overcharges cells and creates a serious fire risk.</p>
+    <p><strong>Using a lower-voltage charger than your battery:</strong> usually just fails to charge fully, or charges extremely slowly, since the charger can't push enough voltage to reach full capacity.</p>
+    <p><strong>The physical plug fitting is not a safety guarantee.</strong> Many chargers across different voltage families use the same barrel connector size (5.5mm x 2.1mm is extremely common across 36V, 48V, and 52V systems) — so a charger can physically plug in while being completely wrong for your battery. Always check the printed voltage, never just the plug shape.</p>`
+  },
+  "winter-storage": {
+    title: "Storing Your Battery in Winter",
+    html: `<p>Cold weather doesn't just reduce range temporarily — improper winter storage can permanently shorten a lithium battery's lifespan.</p>
+    <p><strong>Key rules for winter storage:</strong></p>
+    <ul>
+      <li>Bring the battery indoors if temperatures drop below freezing — never leave it on the bike in an unheated garage or outdoors overnight.</li>
+      <li>Charge to roughly 40-60% before long-term storage, not 100%.</li>
+      <li>Never charge a battery that is still cold from being outside — let it reach room temperature first, since charging cold cells can cause internal lithium plating that permanently reduces capacity.</li>
+      <li>Check the charge level roughly once a month during storage, topping up if it's dropped below 20-30%.</li>
+    </ul>
+    <p>Riders who store batteries properly through winter typically see noticeably better range retention the following spring compared to those who leave batteries in cold garages at full or empty charge.</p>`
+  },
+  "connector-types": {
+    title: "Connector Types Explained",
+    html: `<p>Voltage matching gets most of the attention, but connector shape matters just as much — a battery can be the exact right voltage and still be physically or electrically incompatible if the connector doesn't match.</p>
+    <p><strong>Common connector types in e-bikes and scooters:</strong></p>
+    <ul>
+      <li><strong>XT60 / XT90</strong> — Common bullet-style connectors on many aftermarket and hobbyist battery packs.</li>
+      <li><strong>Anderson (Powerpole)</strong> — Often used on higher-power e-bike systems and some scooters.</li>
+      <li><strong>5.5mm x 2.1mm barrel</strong> — Extremely common on charger ports specifically (not the battery-to-controller connection), used across many different voltage families — which is exactly why voltage must be double-checked separately.</li>
+      <li><strong>Proprietary manufacturer connectors</strong> — Many major brands (Rad Power, Aventon, Bosch, Shimano systems) use their own connector shapes specifically to prevent third-party swaps, for better or worse.</li>
+    </ul>
+    <p>Before buying any replacement, compare a clear photo of your existing connector's pin count and shape against the listing photos — not just the voltage spec.</p>`
+  }
+};
+
+function openGuide(key) {
+  const g = guideContent[key];
+  document.getElementById('guideTitle').textContent = g.title;
+  document.getElementById('guideBody').innerHTML = g.html;
+  document.getElementById('guideModal').classList.add('show');
+}
+function closeGuide() { document.getElementById('guideModal').classList.remove('show'); }
+document.getElementById('guideModal').addEventListener('click', (e) => {
+  if (e.target.id === 'guideModal') closeGuide();
+});
 
 function openDetails(battery, modelName) {
   document.getElementById('detailsTitle').textContent = battery.name;

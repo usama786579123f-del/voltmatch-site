@@ -188,6 +188,16 @@
   </div>
 </div>
 
+<div id="detailsModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="detailsTitle">Battery Details</h3>
+      <span class="modal-close" onclick="closeDetails()">✕</span>
+    </div>
+    <div id="detailsBody"></div>
+  </div>
+</div>
+
 <div class="container" id="top">
   <header class="hero">
     <div>
@@ -601,7 +611,7 @@ function render(key) {
       <div><div class="col-val">${c.cap}</div><div class="col-lbl">Capacity</div></div>
       <div><div class="col-val">${c.energy}</div><div class="col-lbl">Energy</div></div>
       <div class="badge ${c.status}">${c.status==='verified' ? '✓ Verified Fit' : '⚠ Needs Verification'}</div>
-      <button class="btn-view">View Details</button>
+      <button class="btn-view" onclick='openDetails(${JSON.stringify(c)}, "${b.name.replace(/"/g,'')}")'>View Details</button>
       <div class="chevron">›</div>
     </div>
   `).join('');
@@ -845,6 +855,36 @@ function openLegal(key) {
 function closeLegal() { document.getElementById('legalModal').classList.remove('show'); }
 document.getElementById('legalModal').addEventListener('click', (e) => {
   if (e.target.id === 'legalModal') closeLegal();
+});
+
+// ⚠️ Once your Amazon Associates account is approved, put your tracking ID here (e.g. "yourtag-20")
+const AMAZON_AFFILIATE_TAG = "";
+
+function openDetails(battery, modelName) {
+  document.getElementById('detailsTitle').textContent = battery.name;
+
+  const amazonQuery = encodeURIComponent(battery.name);
+  const amazonUrl = AMAZON_AFFILIATE_TAG
+    ? `https://www.amazon.com/s?k=${amazonQuery}&tag=${AMAZON_AFFILIATE_TAG}`
+    : `https://www.amazon.com/s?k=${amazonQuery}`;
+
+  document.getElementById('detailsBody').innerHTML = `
+    <p style="font-size:13px; color:var(--slate); margin-bottom:16px;">${battery.sub}</p>
+    <div class="spec-grid" style="margin-top:0;">
+      <div class="spec-cell"><div class="spec-icon">⚡</div><div><div class="spec-label">Voltage</div><div class="spec-value" style="font-size:16px;">${battery.v}</div></div></div>
+      <div class="spec-cell"><div class="spec-icon">🔋</div><div><div class="spec-label">Capacity</div><div class="spec-value" style="font-size:16px;">${battery.cap}</div></div></div>
+      <div class="spec-cell"><div class="spec-icon">🔌</div><div><div class="spec-label">Energy</div><div class="spec-value" style="font-size:16px;">${battery.energy}</div></div></div>
+    </div>
+    <div class="badge ${battery.status}" style="margin-top:16px; display:inline-flex;">${battery.status==='verified' ? '✓ Verified Fit' : '⚠ Needs Verification'}</div>
+    <p style="font-size:12.5px; color:var(--slate-light); margin-top:14px; line-height:1.6;">For: <strong>${modelName}</strong>. Always confirm this battery's connector shape matches your charger before purchasing — voltage match alone doesn't guarantee physical fit.</p>
+    <a href="${amazonUrl}" target="_blank" rel="noopener" class="btn-contact" style="display:block; text-align:center; text-decoration:none; margin-top:18px;">Search on Amazon ↗</a>
+  `;
+
+  document.getElementById('detailsModal').classList.add('show');
+}
+function closeDetails() { document.getElementById('detailsModal').classList.remove('show'); }
+document.getElementById('detailsModal').addEventListener('click', (e) => {
+  if (e.target.id === 'detailsModal') closeDetails();
 });
 </script>
 

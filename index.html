@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltMatch — Find the Right Replacement Battery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white:#FFFFFF; --bg:#FAFAF8; --ink:#14161A; --green:#1E6B4F; --green-dark:#123C2D;
+    --green-soft:#EAF4EF; --amber:#B8790E; --amber-soft:#FDF3E1; --slate:#5B6472; --slate-light:#94A0AC; --border:#E9E7E2;
+  }
+  body[data-theme="dark"] {
+    --white:#1A1D1E; --bg:#141617; --ink:#F0F2F0; --green:#3FA57C; --green-dark:#2A7A5C;
+    --green-soft:#1E2E27; --amber:#E0A542; --amber-soft:#2E2718; --slate:#9AA5A0; --slate-light:#697068; --border:#2C302E;
+  }
+  body { transition: background 0.2s, color 0.2s; }
+  body[data-theme="dark"] .hero-visual { background: radial-gradient(ellipse at center, #1E2622 0%, transparent 70%); }
+  body[data-theme="dark"] img { opacity: 0.92; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:var(--white); color:var(--ink); }
+  .container { max-width:1240px; margin:0 auto; padding:0 40px; }
+
+  nav { border-bottom:1px solid var(--border); padding:18px 0; }
+  .nav-inner { display:flex; align-items:center; justify-content:space-between; }
+  .nav-left { display:flex; align-items:center; gap:44px; }
+  .logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:20px; }
+  .logo-icon { width:34px; height:34px; background:var(--green-soft); border:1.5px solid var(--green); border-radius:9px; display:flex; align-items:center; justify-content:center; color:var(--green); font-size:16px; }
+  .nav-links { display:flex; gap:32px; font-size:14.5px; font-weight:500; color:var(--ink); }
+  .nav-links a { text-decoration:none; color:var(--ink); padding-bottom:6px; border-bottom:2px solid transparent; }
+  .nav-links a.active { color:var(--green); border-color:var(--green); font-weight:600; }
+  .nav-right { display:flex; align-items:center; gap:14px; }
+  .icon-btn { width:38px; height:38px; border-radius:50%; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .btn-contact { background:var(--green-dark); color:var(--white); border:none; padding:11px 22px; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer; }
+
+  header.hero { padding:64px 0 40px; display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+  h1 { font-size:46px; font-weight:800; line-height:1.15; letter-spacing:-0.015em; }
+  h1 .accent { color:var(--green); }
+  .hero p { margin-top:18px; font-size:16.5px; color:var(--slate); max-width:440px; }
+  .trust-row { display:flex; gap:22px; margin-top:26px; flex-wrap:wrap; }
+  .trust-item { display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:500; color:var(--ink); }
+  .trust-dot { width:22px; height:22px; border-radius:50%; background:var(--green-soft); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:11px; }
+
+  .hero-visual { position:relative; height:320px; background:radial-gradient(ellipse at center, #F1F6F3 0%, transparent 70%); display:flex; align-items:center; justify-content:center; }
+
+  .lookup-card { background:var(--white); border:1px solid var(--border); border-radius:20px; padding:28px; box-shadow:0 12px 32px rgba(20,22,26,0.05); margin-top:20px; }
+  .lookup-row { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
+  .field-label { font-size:12.5px; font-weight:600; color:var(--slate); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.03em; }
+  .select-wrap { position:relative; flex:1; min-width:260px; }
+  select { width:100%; font-family:'Inter',sans-serif; font-size:16px; font-weight:600; padding:14px 40px 14px 44px; border:1.5px solid var(--border); border-radius:12px; background:var(--white); appearance:none; cursor:pointer; }
+  .select-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; }
+  .select-wrap::after { content:''; }
+
+  .search-input { width:100%; font-family:'Inter',sans-serif; font-size:16px; font-weight:600; padding:14px 40px 14px 44px; border:1.5px solid var(--border); border-radius:12px; background:var(--white); color:var(--ink); }
+  .search-input:focus { outline:none; border-color:var(--green); }
+  .search-dropdown { display:none; position:absolute; top:calc(100% + 6px); left:0; right:0; background:var(--white); border:1.5px solid var(--border); border-radius:12px; box-shadow:0 12px 28px rgba(20,22,26,0.12); max-height:280px; overflow-y:auto; z-index:20; }
+  .search-dropdown.show { display:block; }
+  .search-result { padding:12px 16px; cursor:pointer; font-size:14.5px; font-weight:500; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .search-result:last-child { border-bottom:none; }
+  .search-result:hover, .search-result.highlighted { background:var(--green-soft); }
+  .search-result .sr-volt { font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--slate); }
+  .search-no-results { padding:16px; font-size:13.5px; color:var(--slate-light); text-align:center; }
+
+  .match-badge { display:flex; align-items:center; gap:10px; background:var(--green-soft); border-radius:12px; padding:12px 18px; }
+  .match-badge .check { width:26px; height:26px; border-radius:50%; background:var(--green); color:var(--white); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+  .match-badge-text .t1 { font-weight:700; font-size:13.5px; color:var(--green-dark); }
+  .match-badge-text .t2 { font-size:12px; color:var(--green); }
+
+  .selected-model-info { display:none; }
+
+  .spec-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-top:24px; }
+  .spec-cell { background:var(--white); padding:20px 22px; display:flex; align-items:center; gap:14px; }
+  .spec-icon { width:38px; height:38px; border-radius:10px; background:var(--green-soft); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .spec-label { font-size:12.5px; color:var(--slate); }
+  .spec-value { font-size:19px; font-weight:700; margin-top:2px; }
+  .spec-sub { font-size:11.5px; color:var(--slate-light); margin-top:1px; }
+
+  .compat-header { display:flex; justify-content:space-between; align-items:center; margin-top:30px; margin-bottom:14px; }
+  .compat-header h3 { font-size:17px; font-weight:700; }
+
+  .compat-row { display:grid; grid-template-columns: 40px 1.6fr 0.7fr 0.7fr 0.7fr 1fr 100px 20px; align-items:center; gap:16px; padding:16px 14px; border:1px solid var(--border); border-radius:12px; margin-bottom:10px; }
+  .batt-icon { width:40px; height:40px; border-radius:9px; background:var(--ink); color:var(--white); display:flex; align-items:center; justify-content:center; font-size:16px; overflow:hidden; }
+  .batt-name { font-weight:600; font-size:14px; }
+  .batt-sub { font-size:12px; color:var(--slate-light); margin-top:2px; }
+  .col-val { font-weight:600; font-size:13.5px; }
+  .col-lbl { font-size:11px; color:var(--slate-light); }
+  .badge { font-size:12px; font-weight:600; padding:6px 12px; border-radius:100px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+  .badge.verified { background:var(--green-soft); color:var(--green-dark); }
+  .badge.check { background:var(--amber-soft); color:var(--amber); }
+  .btn-view { background:var(--green-dark); color:var(--white); border:none; padding:9px 16px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .chevron { color:var(--slate-light); text-align:center; }
+
+  .more-link { text-align:center; margin-top:18px; }
+  .more-link a { color:var(--green); font-weight:600; font-size:14px; text-decoration:none; }
+
+  footer { border-top:1px solid var(--border); margin-top:70px; padding:44px 0 40px; display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr auto; gap:30px; }
+  .footer-brand p { font-size:13px; color:var(--slate); margin-top:10px; max-width:220px; }
+  .footer-col h4 { font-size:13.5px; font-weight:700; margin-bottom:14px; }
+  .footer-col a { display:block; font-size:13px; color:var(--slate); text-decoration:none; margin-bottom:10px; }
+  .footer-meta { font-size:12px; color:var(--slate-light); align-self:flex-start; }
+  .social-row { display:flex; gap:10px; margin-top:14px; }
+  .social-row span { width:32px; height:32px; border-radius:50%; background:var(--bg); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:13px; }
+
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(20,22,26,0.5); z-index:100; align-items:center; justify-content:center; }
+  .modal-overlay.show { display:flex; }
+  .modal-box { background:var(--white); border-radius:16px; padding:28px; width:400px; max-width:90vw; }
+  .modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .modal-head h3 { font-size:18px; font-weight:700; }
+  .modal-close { cursor:pointer; color:var(--slate); font-size:16px; }
+  .modal-sub { font-size:13px; color:var(--slate); margin-bottom:16px; }
+  .modal-input { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:9px; margin-bottom:10px; font-family:'Inter',sans-serif; font-size:14px; }
+  .modal-input:focus { outline:none; border-color:var(--green); }
+  .legal-box { width:640px; max-height:80vh; display:flex; flex-direction:column; }
+  .legal-body { overflow-y:auto; padding-right:6px; font-size:13.5px; color:var(--slate); line-height:1.75; }
+  .legal-body h4 { color:var(--ink); font-size:14.5px; font-weight:700; margin:18px 0 6px; }
+  .legal-body h4:first-child { margin-top:0; }
+  .legal-body p { margin-bottom:10px; }
+  .legal-body ul { margin:0 0 10px 20px; }
+  .legal-body li { margin-bottom:6px; }
+  .legal-updated { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate-light); margin-bottom:16px; }
+
+  .info-section { padding:60px 0; border-top:1px solid var(--border); scroll-margin-top:80px; }
+  .info-section h2 { font-size:26px; font-weight:800; margin-bottom:14px; }
+  .info-section p { color:var(--slate); font-size:15px; max-width:640px; line-height:1.7; margin-bottom:10px; }
+  .guide-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:24px; }
+  .guide-card { border:1px solid var(--border); border-radius:14px; padding:20px; }
+  .guide-card .g-icon { font-size:22px; margin-bottom:10px; }
+  .guide-card .g-icon-img { width:32px; height:32px; object-fit:contain; margin-bottom:10px; }
+  .guide-card h4 { font-size:15px; font-weight:700; margin-bottom:6px; }
+  .guide-card p { font-size:13px; margin:0; }
+
+  @media (max-width:860px) {
+    .guide-grid { grid-template-columns:1fr; }
+    header.hero { grid-template-columns:1fr; }
+    h1 { font-size:32px; }
+    .nav-links { display:none; }
+    .compat-row { grid-template-columns: 36px 1fr; row-gap:8px; }
+    .compat-row > *:nth-child(n+3) { grid-column: 2; }
+    footer { grid-template-columns:1fr 1fr; }
+    .container { padding:0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container nav-inner">
+    <div class="nav-left">
+      <div class="logo"><span class="logo-icon">⚡</span> VoltMatch</div>
+      <div class="nav-links">
+        <a href="#top" class="active" onclick="scrollToSection('top');return false;">Home</a>
+        <a href="#tool" onclick="scrollToSection('tool');return false;">Find Battery</a>
+        <a href="#guides" onclick="scrollToSection('guides');return false;">Guides</a>
+        <a href="#battery101" onclick="scrollToSection('battery101');return false;">Battery 101</a>
+        <a href="#about" onclick="scrollToSection('about');return false;">About</a>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="icon-btn" id="themeToggle">☀️</div>
+      <button class="btn-contact" onclick="openContact()">Contact Us</button>
+    </div>
+  </div>
+</nav>
+
+<div id="contactModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Contact VoltMatch</h3>
+      <span class="modal-close" onclick="closeContact()">✕</span>
+    </div>
+    <p class="modal-sub">Spotted wrong specs, or want a model added? Tell us.</p>
+    <input type="text" id="cName" placeholder="Your name" class="modal-input">
+    <input type="email" id="cEmail" placeholder="Your email" class="modal-input">
+    <textarea id="cMessage" placeholder="Your message" class="modal-input" rows="4"></textarea>
+    <div id="cStatus" style="font-size:12.5px; margin-bottom:8px; display:none;"></div>
+    <button class="btn-contact" style="width:100%; margin-top:6px;" id="cSendBtn" onclick="sendContactForm()">Send Message</button>
+  </div>
+</div>
+
+<div id="legalModal" class="modal-overlay">
+  <div class="modal-box legal-box">
+    <div class="modal-head">
+      <h3 id="legalTitle">Privacy Policy</h3>
+      <span class="modal-close" onclick="closeLegal()">✕</span>
+    </div>
+    <div id="legalBody" class="legal-body"></div>
+  </div>
+</div>
+
+<div class="container" id="top">
+  <header class="hero">
+    <div>
+      <h1>Find the right replacement <span class="accent">battery</span> for your ride</h1>
+      <p>Instantly check compatibility, compare options, and ride with confidence.</p>
+      <div class="trust-row">
+        <div class="trust-item"><span class="trust-dot">✓</span> Accurate Compatibility</div>
+        <div class="trust-item"><span class="trust-dot">✓</span> Verified Batteries</div>
+        <div class="trust-item"><span class="trust-dot">★</span> Trusted by Riders</div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="images/hero-bike-battery.png" alt="E-bike and replacement battery pack" style="width:100%; max-width:520px; height:auto; object-fit:contain;">
+    </div>
+  </header>
+
+  <div class="lookup-card" id="tool">
+    <div class="lookup-row">
+      <div class="select-wrap" style="position:relative;">
+        <div class="field-label">Choose your model</div>
+        <span class="select-icon">🔍</span>
+        <input type="text" id="modelSearch" class="search-input" placeholder="Type your bike or scooter model…" autocomplete="off">
+        <div id="searchDropdown" class="search-dropdown"></div>
+      </div>
+      <div class="match-badge" id="matchBadge">
+        <div class="check">✓</div>
+        <div class="match-badge-text">
+          <div class="t1">Exact match found</div>
+          <div class="t2" id="matchCount">We found 3 compatible options</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-grid" id="specGrid"></div>
+
+    <div class="compat-header">
+      <h3>Compatible Replacement Batteries</h3>
+    </div>
+    <div id="compatList"></div>
+
+    <div class="more-link"><a href="#" id="viewMoreBtn" onclick="toggleMoreOptions();return false;">View more compatible batteries ▾</a></div>
+    <div id="moreOptionsPanel" style="display:none; margin-top:14px;"></div>
+  </div>
+
+  <section class="info-section" id="guides">
+    <h2>Battery Buying Guides</h2>
+    <p>Practical, model-specific guides so you never guess before you buy a replacement pack.</p>
+    <div class="guide-grid">
+      <div class="guide-card"><img src="images/charger-icon.png" alt="Charger" class="g-icon-img"><h4>How to read your charger label</h4><p>Your charger's output voltage tells you your battery's real voltage family — here's how to find and read it.</p></div>
+      <div class="guide-card"><div class="g-icon">🧯</div><h4>Battery safety basics</h4><p>Why mismatched voltage or connector types can cause fire risk, and how to avoid it.</p></div>
+      <div class="guide-card"><div class="g-icon">🔋</div><h4>Third-party vs OEM packs</h4><p>When a third-party battery is a safe swap, and when to stick with the original brand.</p></div>
+    </div>
+  </section>
+
+  <section class="info-section" id="battery101">
+    <h2>Battery 101</h2>
+    <p><strong>Voltage (V)</strong> is the electrical pressure your battery sends to the motor. Most e-bikes and scooters use 36V, 48V, or 52V systems.</p>
+    <p><strong>Capacity (Ah)</strong> is how much charge the battery holds. <strong>Energy (Wh)</strong> = Voltage × Ah, and is the best way to compare range across different batteries.</p>
+    <p><strong>Charger output</strong> is always slightly higher than nominal voltage — a 48V battery charges at 54.6V, a 36V battery at 42V. This is how you can verify a battery's real family even without the spec sheet.</p>
+  </section>
+
+  <section class="info-section" id="about">
+    <h2>About VoltMatch</h2>
+    <p>VoltMatch was built to solve one specific, annoying problem: figuring out which replacement battery actually fits your e-bike or scooter, without spending hours digging through old forum threads.</p>
+    <p>Every spec on this site is cross-checked against manufacturer data and public comparisons before publishing — but batteries are safety-critical, so always verify against your own charger and battery label before buying.</p>
+  </section>
+
+  <p style="font-size:12px; color:var(--slate-light); text-align:center; padding:20px 0 0; border-top:1px solid var(--border); margin-top:10px;">
+    As an Amazon Associate, VoltMatch earns from qualifying purchases. Some links on this site are affiliate links — see our <a href="#" onclick="openLegal('terms');return false;" style="color:var(--slate);">Terms of Service</a> for details.
+  </p>
+</div>
+
+<div class="container">
+  <footer>
+    <div class="footer-brand">
+      <div class="logo"><span class="logo-icon">⚡</span> VoltMatch</div>
+      <p>Powering every ride. Matching every need.</p>
+      <div class="social-row"><span>f</span><span>◎</span><span>▶</span><span>✉</span></div>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#about" onclick="scrollToSection('about');return false;">About Us</a>
+      <a href="#" onclick="openContact();return false;">Contact</a>
+      <a href="#" onclick="alert('Careers page — add your content here.');return false;">Careers</a>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="#guides" onclick="scrollToSection('guides');return false;">Battery Guides</a>
+      <a href="#battery101" onclick="scrollToSection('battery101');return false;">Battery 101</a>
+      <a href="#" onclick="alert('FAQ page — add your content here.');return false;">FAQ</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="#" onclick="openLegal('privacy');return false;">Privacy Policy</a>
+      <a href="#" onclick="openLegal('terms');return false;">Terms of Service</a>
+      <a href="#" onclick="openLegal('refund');return false;">Refund Policy</a>
+    </div>
+    <div class="footer-meta">© 2026 VoltMatch.<br>All rights reserved.</div>
+  </footer>
+</div>
+
+<script>
+const bikeData = {
+  "aventon-aventure": {
+    name: "Aventon Aventure 2", years: "2022 – 2024",
+    voltage: "48V", voltageSub:"(Nominal)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "14Ah", capacitySub:"672Wh",
+    compatible: [
+      { name:"Aventon 48V 14Ah (672Wh)", sub:"Original Aventon Battery", v:"48V", cap:"14Ah", energy:"672Wh", status:"verified" },
+      { name:"Unit Pack Power 48V 15Ah", sub:"Unit Pack Power", v:"48V", cap:"15Ah", energy:"720Wh", status:"verified" },
+      { name:"ChamRider 48V 13Ah", sub:"ChamRider", v:"48V", cap:"13Ah", energy:"624Wh", status:"check" }
+    ]
+  },
+  "m365": {
+    name: "Xiaomi Mi Electric Scooter M365", years: "2016 – 2019",
+    voltage: "36V", voltageSub:"(10S Nominal)",
+    charger: "42V  1.7A", chargerSub:"(Recommended)",
+    capacity: "7.8Ah", capacitySub:"280Wh",
+    compatible: [
+      { name:"Xiaomi OEM 36V 7.8Ah", sub:"Original Xiaomi Battery", v:"36V", cap:"7.8Ah", energy:"280Wh", status:"verified" },
+      { name:"Generic 36V 10S Li-ion Pack", sub:"Third-party, 42V charger family", v:"36V", cap:"8-10Ah", energy:"288-360Wh", status:"verified" },
+      { name:"Segway ES2/ES4 Battery Pack", sub:"Segway-Ninebot", v:"36V", cap:"5.2Ah", energy:"187Wh", status:"check" }
+    ]
+  },
+  "m365pro": {
+    name: "Xiaomi Mi Electric Scooter Pro", years: "2018 – 2020",
+    voltage: "36V", voltageSub:"(10S Nominal)",
+    charger: "42V  1.7A", chargerSub:"(Recommended)",
+    capacity: "12.8Ah", capacitySub:"474Wh",
+    compatible: [
+      { name:"Xiaomi OEM Pro 36V 12.8Ah", sub:"Original Xiaomi Battery", v:"36V", cap:"12.8Ah", energy:"474Wh", status:"verified" },
+      { name:"Standard M365 Battery (non-Pro)", sub:"Fits, lower range", v:"36V", cap:"7.8Ah", energy:"280Wh", status:"check" }
+    ]
+  },
+  "es2": {
+    name: "Segway Ninebot ES2", years: "2017 – 2020",
+    voltage: "36V", voltageSub:"(10S Nominal)",
+    charger: "42V  1.7A", chargerSub:"(Recommended)",
+    capacity: "5.2Ah", capacitySub:"187Wh",
+    compatible: [
+      { name:"Segway OEM 36V 5.2Ah", sub:"Original Segway Battery", v:"36V", cap:"5.2Ah", energy:"187Wh", status:"verified" },
+      { name:"Ninebot ES4 Add-on Pack", sub:"Segway-Ninebot official", v:"36V", cap:"5.2Ah", energy:"187Wh", status:"verified" },
+      { name:"Xiaomi M365 Battery", sub:"Same voltage family — verify connector", v:"36V", cap:"7.8Ah", energy:"280Wh", status:"check" }
+    ]
+  },
+  "es4": {
+    name: "Segway Ninebot ES4", years: "2018 – 2021",
+    voltage: "36V x2", voltageSub:"(Dual Pack)",
+    charger: "42V  1.7A", chargerSub:"(Recommended)",
+    capacity: "5.2Ah x2", capacitySub:"374Wh combined",
+    compatible: [
+      { name:"ES2 Base + Add-on Pack", sub:"Designed pairing", v:"36V", cap:"5.2Ah", energy:"187Wh", status:"verified" }
+    ]
+  },
+  "lectric-xp": {
+    name: "Lectric XP 2.0 / 3.0", years: "2021 – 2024",
+    voltage: "48V", voltageSub:"(13S Nominal)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "10.4Ah", capacitySub:"~499Wh",
+    compatible: [
+      { name:"Lectric OEM 48V 10.4Ah", sub:"Original Lectric Battery", v:"48V", cap:"10.4Ah", energy:"499Wh", status:"verified" },
+      { name:"Rad Power / Aventon 48V Packs", sub:"Same 54.6V charger family — verify pinout", v:"48V", cap:"14Ah", energy:"672Wh", status:"check" }
+    ]
+  },
+  "rad-runner": {
+    name: "Rad Power RadRunner", years: "2019 – 2023",
+    voltage: "48V", voltageSub:"(13S Nominal)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "14Ah", capacitySub:"672Wh",
+    compatible: [
+      { name:"Rad Power OEM 48V 14Ah", sub:"Original Rad Power Battery", v:"48V", cap:"14Ah", energy:"672Wh", status:"verified" },
+      { name:"Lectric / Aventon 48V Packs", sub:"Same 54.6V charger family — verify pinout", v:"48V", cap:"10-15Ah", energy:"480-720Wh", status:"check" }
+    ]
+  },
+  "aventon-level": {
+    name: "Aventon Level", years: "2021 – 2024",
+    voltage: "48V", voltageSub:"(13S Nominal)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "14Ah", capacitySub:"672Wh",
+    compatible: [
+      { name:"Aventon OEM 48V 14Ah", sub:"Original Aventon Battery", v:"48V", cap:"14Ah", energy:"672Wh", status:"verified" },
+      { name:"Unit Pack Power 48V 15Ah", sub:"Unit Pack Power", v:"48V", cap:"15Ah", energy:"720Wh", status:"verified" }
+    ]
+  },
+  "aventon-pace500": {
+    name: "Aventon Pace 500", years: "2020 – 2024",
+    voltage: "48V", voltageSub:"(Confirmed, owner's manual)",
+    charger: "54.6V  3A", chargerSub:"(Recommended)",
+    capacity: "11.6Ah", capacitySub:"556.8Wh",
+    compatible: [
+      { name:"Aventon OEM 48V 11.6Ah", sub:"Original Aventon Battery", v:"48V", cap:"11.6Ah", energy:"556.8Wh", status:"verified" },
+      { name:"Aventon 48V 14Ah (upgraded capacity option)", sub:"Official larger option", v:"48V", cap:"14Ah", energy:"672Wh", status:"verified" }
+    ]
+  },
+  "aventon-soltera": {
+    name: "Aventon Soltera", years: "2022 – 2024",
+    voltage: "36V", voltageSub:"(10S Nominal — verify)",
+    charger: "42V  2A", chargerSub:"(Standard 36V family)",
+    capacity: "10.4Ah", capacitySub:"~374Wh",
+    compatible: [ { name:"Generic 36V 10S packs (42V charger family)", sub:"Verify connector before buying", v:"36V", cap:"8-11Ah", energy:"288-400Wh", status:"check" } ]
+  },
+  "radcity": {
+    name: "Rad Power RadCity", years: "2018 – 2024",
+    voltage: "48V", voltageSub:"(13S Nominal)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "14Ah", capacitySub:"672Wh",
+    compatible: [
+      { name:"Rad Power OEM 48V 14Ah", sub:"Original Rad Power Battery", v:"48V", cap:"14Ah", energy:"672Wh", status:"verified" },
+      { name:"Lectric / Aventon 48V Packs", sub:"Same charger family — verify pinout", v:"48V", cap:"10-15Ah", energy:"480-720Wh", status:"check" }
+    ]
+  },
+  "radwagon": {
+    name: "Rad Power RadWagon", years: "2019 – 2024",
+    voltage: "48V", voltageSub:"(13S Nominal)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "14Ah", capacitySub:"672Wh",
+    compatible: [ { name:"Rad Power OEM 48V 14Ah", sub:"Original Rad Power Battery", v:"48V", cap:"14Ah", energy:"672Wh", status:"verified" } ]
+  },
+  "ride1up-core5": {
+    name: "Ride1Up Core-5", years: "2021 – 2024",
+    voltage: "48V", voltageSub:"(Confirmed — capacity varies by year)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "10.4-14Ah", capacitySub:"500-672Wh (varies by year)",
+    compatible: [
+      { name:"Ride1Up OEM 48V 14Ah", sub:"Official replacement, Reention EEL", v:"48V", cap:"14Ah", energy:"672Wh", status:"verified" },
+      { name:"American Electric 48V packs (Ride1Up-compatible)", sub:"Third-party, confirm exact year", v:"48V", cap:"10.4-14Ah", energy:"500-672Wh", status:"check" }
+    ]
+  },
+  "ride1up-700series": {
+    name: "Ride1Up 700 Series", years: "2020 – 2023",
+    voltage: "48V", voltageSub:"(Confirmed — capacity varies by cell type)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "13.4-15Ah", capacitySub:"643-720Wh (varies by cell generation)",
+    compatible: [
+      { name:"Ride1Up OEM 48V 14Ah (Reention Rhino)", sub:"Official replacement", v:"48V", cap:"14Ah", energy:"672Wh", status:"verified" },
+      { name:"American Electric 48V packs", sub:"Third-party, confirm exact generation", v:"48V", cap:"13.4-15Ah", energy:"643-720Wh", status:"check" }
+    ]
+  },
+  "lectric-xpedition": {
+    name: "Lectric XPedition", years: "2023 – 2024",
+    voltage: "48V", voltageSub:"(13S Nominal — verify)",
+    charger: "54.6V  2A", chargerSub:"(Standard 48V family)",
+    capacity: "14Ah", capacitySub:"~672Wh",
+    compatible: [ { name:"Lectric XP-family packs", sub:"Same brand — verify exact model fit", v:"48V", cap:"10.4-14Ah", energy:"499-672Wh", status:"check" } ]
+  },
+  "ecotric-vortex": {
+    name: "Ecotric Vortex", years: "2021 – 2024",
+    voltage: "36V", voltageSub:"(Confirmed, official Ecotric.com)",
+    charger: "42V  2A", chargerSub:"(Recommended)",
+    capacity: "12.5Ah", capacitySub:"450Wh",
+    compatible: [
+      { name:"Ecotric OEM 36V 12.5Ah", sub:"Official — also fits Rocket, Leopard, Fat Tire 26\" Beach Snow", v:"36V", cap:"12.5Ah", energy:"450Wh", status:"verified" },
+      { name:"Ecotric OEM 36V 9Ah (compact option)", sub:"Official smaller-capacity option", v:"36V", cap:"9Ah", energy:"324Wh", status:"verified" }
+    ]
+  },
+  "heybike-ranger": {
+    name: "Heybike Ranger", years: "2021 – 2024",
+    voltage: "48V", voltageSub:"(Confirmed, official spare battery)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "15Ah", capacitySub:"720Wh",
+    compatible: [ { name:"Heybike OEM 48V 15Ah", sub:"Official Ranger/Ranger S spare battery", v:"48V", cap:"15Ah", energy:"720Wh", status:"verified" } ]
+  },
+  "velotric-discover1": {
+    name: "Velotric Discover Series", years: "2022 – 2024",
+    voltage: "48V", voltageSub:"(Confirmed, official spare battery — Discover 3)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "15.2-16.7Ah", capacitySub:"730-802Wh (varies by version)",
+    compatible: [ { name:"Velotric OEM 48V 15.2Ah / 16.7Ah", sub:"Official Velotric spare battery", v:"48V", cap:"15.2-16.7Ah", energy:"730-802Wh", status:"verified" } ]
+  },
+  "himiway-cruiser": {
+    name: "Himiway Cruiser", years: "2020 – 2024",
+    voltage: "48V", voltageSub:"(13S Nominal — high capacity)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "20Ah", capacitySub:"960Wh",
+    compatible: [ { name:"Himiway OEM 48V 20Ah", sub:"Original Himiway Battery", v:"48V", cap:"20Ah", energy:"960Wh", status:"verified" } ]
+  },
+  "swagtron-eb5": {
+    name: "Swagtron EB5", years: "2019 – 2022",
+    voltage: "36V", voltageSub:"(Confirmed, official Swagtron Q&A)",
+    charger: "42V  2A", chargerSub:"(Recommended)",
+    capacity: "7.8Ah", capacitySub:"280.8Wh",
+    compatible: [ { name:"Swagtron OEM 36V 7.8Ah", sub:"Official Swagtron EB5 battery", v:"36V", cap:"7.8Ah", energy:"280.8Wh", status:"verified" } ]
+  },
+  "gotrax-gxl": {
+    name: "Gotrax GXL V2 (Scooter)", years: "2020 – 2023",
+    voltage: "36V", voltageSub:"(Confirmed, official Gotrax store)",
+    charger: "42V  1.7A", chargerSub:"(Recommended)",
+    capacity: "5.2Ah", capacitySub:"187.2Wh",
+    compatible: [ { name:"Gotrax OEM 36V 5.2Ah (Part# 605013)", sub:"Official Gotrax battery — also fits Gotrax Rival", v:"36V", cap:"5.2Ah", energy:"187.2Wh", status:"verified" } ]
+  },
+  "hiboy-s2": {
+    name: "Hiboy S2 (Scooter)", years: "2020 – 2023",
+    voltage: "36V", voltageSub:"(Confirmed, official Hiboy.com)",
+    charger: "42V  1.7A", chargerSub:"(Recommended)",
+    capacity: "7.5Ah", capacitySub:"270Wh",
+    compatible: [ { name:"Hiboy OEM S2/KS4 36V 7.5Ah", sub:"Official — S2 only, not compatible with S2 Lite/Pro", v:"36V", cap:"7.5Ah", energy:"270Wh", status:"verified" } ]
+  },
+  "ninebot-max-g30": {
+    name: "Segway Ninebot MAX G30", years: "2020 – 2023",
+    voltage: "36V", voltageSub:"(High capacity, 42V charger)",
+    charger: "42V  1.7A", chargerSub:"(Recommended)",
+    capacity: "15.3Ah", capacitySub:"551Wh",
+    compatible: [ { name:"Segway OEM MAX G30 pack", sub:"Original Segway Battery", v:"36V", cap:"15.3Ah", energy:"551Wh", status:"verified" } ]
+  },
+  "super73-r": {
+    name: "Super73 R Series", years: "2021 – 2024",
+    voltage: "48V", voltageSub:"(Confirmed, official Super73 store)",
+    charger: "54.6V  2-5A", chargerSub:"(Recommended)",
+    capacity: "20Ah", capacitySub:"960Wh",
+    compatible: [ { name:"Super73 OEM S2/R-Series 48V 20Ah", sub:"Official Super73 battery", v:"48V", cap:"20Ah", energy:"960Wh", status:"verified" } ],
+    note: "Note: newer 'R Adventure' and 'RX Mojave' variants use a different 52V platform — confirm your exact trim before buying."
+  },
+  "super73-z": {
+    name: "Super73 Z Series", years: "2020 – 2023",
+    voltage: "48V", voltageSub:"(Confirmed — S73-700 pack, 13S5P)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "14.5Ah", capacitySub:"696Wh",
+    compatible: [ { name:"Super73 OEM S73-700 48V 14.5Ah", sub:"Official Super73 Z-series battery", v:"48V", cap:"14.5Ah", energy:"696Wh", status:"verified" } ]
+  },
+  "ride1up-prodigy": {
+    name: "Ride1Up Prodigy", years: "2022 – 2024",
+    voltage: "36V (v1) or 48V (v2)", voltageSub:"⚠ Two different systems — check your version",
+    charger: "42V (v1) or 54.6V (v2)", chargerSub:"Depends on which Prodigy you own",
+    capacity: "14Ah / 10.5Ah", capacitySub:"Varies by version — do not assume",
+    compatible: [
+      { name:"Prodigy v1 — Phylion BN21 36V 14Ah", sub:"Original Ride1Up Battery (v1 only)", v:"36V", cap:"14Ah", energy:"504Wh", status:"verified" },
+      { name:"Prodigy v2 — 48V 10.5Ah/14Ah", sub:"Original Ride1Up Battery (v2 only)", v:"48V", cap:"10.5-14Ah", energy:"504-672Wh", status:"verified" }
+    ]
+  },
+  "juiced-crosscurrent": {
+    name: "Juiced Bikes CrossCurrent S2", years: "2019 – 2023",
+    voltage: "52V", voltageSub:"(Confirmed, official spec sheet — 14S5P)",
+    charger: "58.8V  8A", chargerSub:"(Recommended)",
+    capacity: "13Ah", capacitySub:"673Wh",
+    compatible: [ { name:"Juiced OEM 52V 13Ah", sub:"Official CrossCurrent S2 battery, LG Chem cells", v:"52V", cap:"13Ah", energy:"673Wh", status:"verified" } ]
+  },
+  "ninebot-max-g2": {
+    name: "Segway Ninebot MAX G2", years: "2023 – 2024",
+    voltage: "36V", voltageSub:"(Confirmed, official Segway specs)",
+    charger: "42V  1.7A", chargerSub:"(Recommended)",
+    capacity: "15.3Ah", capacitySub:"551Wh",
+    compatible: [ { name:"Segway OEM MAX G2 pack", sub:"Original Segway Battery", v:"36V", cap:"15.3Ah", energy:"551Wh", status:"verified" } ]
+  },
+  "radexpand5": {
+    name: "Rad Power RadExpand 5", years: "2022 – 2024",
+    voltage: "48V", voltageSub:"(Confirmed, official Rad Power specs)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "14Ah", capacitySub:"672Wh",
+    compatible: [
+      { name:"Rad Power OEM 48V 14Ah", sub:"Original Rad Power Battery", v:"48V", cap:"14Ah", energy:"672Wh", status:"verified" },
+      { name:"Lectric / Aventon 48V Packs", sub:"Same charger family — verify pinout", v:"48V", cap:"10-15Ah", energy:"480-720Wh", status:"check" }
+    ]
+  },
+  "radmission1": {
+    name: "Rad Power RadMission 1", years: "2020 – 2023",
+    voltage: "48V", voltageSub:"(Confirmed, official Rad Power battery guide)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "10.5Ah", capacitySub:"504Wh",
+    compatible: [ { name:"Rad Power OEM 48V 10.5Ah", sub:"Original RadMission-specific battery", v:"48V", cap:"10.5Ah", energy:"504Wh", status:"verified" } ]
+  },
+  "radtrike": {
+    name: "Rad Power RadTrike", years: "2023 – 2024",
+    voltage: "40V", voltageSub:"⚠ Unique platform — NOT the same as other Rad models",
+    charger: "46V  2A", chargerSub:"(Confirm exact rating with Rad Power)",
+    capacity: "10Ah", capacitySub:"~400Wh",
+    compatible: [ { name:"Rad Power OEM RadTrike 40V 10Ah", sub:"Official — NOT cross-compatible with RadRover/RadRunner/RadWagon 48V packs, or RadMission", v:"40V", cap:"10Ah", energy:"400Wh", status:"verified" } ],
+    note: "RadTrike uses a unique 40V system — it is NOT interchangeable with the 48V batteries used on most other Rad Power models. Never assume cross-compatibility within the same brand."
+  },
+  "kaabo-mantis8": {
+    name: "Kaabo Mantis 8", years: "2023 – 2024",
+    voltage: "48V", voltageSub:"(Confirmed, official Kaabo specs)",
+    charger: "54.6V  2A", chargerSub:"(Recommended)",
+    capacity: "13Ah", capacitySub:"624Wh",
+    compatible: [ { name:"Kaabo OEM 48V 13Ah", sub:"Official Mantis 8 battery, 78x 18650 cells", v:"48V", cap:"13Ah", energy:"624Wh", status:"verified" } ]
+  }
+};
+
+let currentModelKey = 'aventon-aventure';
+const searchInput = document.getElementById('modelSearch');
+const searchDropdown = document.getElementById('searchDropdown');
+const specGrid = document.getElementById('specGrid');
+const compatList = document.getElementById('compatList');
+const matchCount = document.getElementById('matchCount');
+
+function render(key) {
+  const b = bikeData[key];
+
+  specGrid.innerHTML = `
+    <div class="spec-cell">
+      <div class="spec-icon">⚡</div>
+      <div><div class="spec-label">Battery Voltage</div><div class="spec-value">${b.voltage}</div><div class="spec-sub">${b.voltageSub}</div></div>
+    </div>
+    <div class="spec-cell">
+      <div class="spec-icon">🔌</div>
+      <div><div class="spec-label">Charger Output</div><div class="spec-value">${b.charger}</div><div class="spec-sub">${b.chargerSub}</div></div>
+    </div>
+    <div class="spec-cell">
+      <div class="spec-icon">🔋</div>
+      <div><div class="spec-label">Capacity</div><div class="spec-value">${b.capacity}</div><div class="spec-sub">${b.capacitySub}</div></div>
+    </div>
+  `;
+
+  matchCount.textContent = `We found ${b.compatible.length} compatible option${b.compatible.length>1?'s':''}`;
+
+  compatList.innerHTML = b.compatible.map(c => `
+    <div class="compat-row">
+      <div class="batt-icon"><img src="images/battery-pack.png" alt="Battery" style="width:100%;height:100%;object-fit:cover;border-radius:9px;"></div>
+      <div><div class="batt-name">${c.name}</div><div class="batt-sub">${c.sub}</div></div>
+      <div><div class="col-val">${c.v}</div><div class="col-lbl">Voltage</div></div>
+      <div><div class="col-val">${c.cap}</div><div class="col-lbl">Capacity</div></div>
+      <div><div class="col-val">${c.energy}</div><div class="col-lbl">Energy</div></div>
+      <div class="badge ${c.status}">${c.status==='verified' ? '✓ Verified Fit' : '⚠ Needs Verification'}</div>
+      <button class="btn-view">View Details</button>
+      <div class="chevron">›</div>
+    </div>
+  `).join('');
+}
+
+function selectModel(key) {
+  currentModelKey = key;
+  searchInput.value = bikeData[key].name;
+  searchDropdown.classList.remove('show');
+  render(key);
+  document.getElementById('moreOptionsPanel').style.display = 'none';
+  document.getElementById('viewMoreBtn').textContent = 'View more compatible batteries ▾';
+}
+
+function renderSearchResults(query) {
+  const q = query.trim().toLowerCase();
+  const matches = Object.entries(bikeData).filter(([key, b]) => b.name.toLowerCase().includes(q));
+
+  if (matches.length === 0) {
+    searchDropdown.innerHTML = `<div class="search-no-results">No models match "${query}" yet — try a different spelling, or check back as we add more.</div>`;
+  } else {
+    searchDropdown.innerHTML = matches.map(([key, b]) => `
+      <div class="search-result" onclick="selectModel('${key}')">
+        <span>${b.name}</span>
+        <span class="sr-volt">${b.voltage.split(' ')[0]}</span>
+      </div>
+    `).join('');
+  }
+  searchDropdown.classList.add('show');
+}
+
+searchInput.addEventListener('focus', () => renderSearchResults(searchInput.value));
+searchInput.addEventListener('input', () => renderSearchResults(searchInput.value));
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.select-wrap')) searchDropdown.classList.remove('show');
+});
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const q = searchInput.value.trim().toLowerCase();
+    const firstMatch = Object.entries(bikeData).find(([key, b]) => b.name.toLowerCase().includes(q));
+    if (firstMatch) selectModel(firstMatch[0]);
+  }
+});
+
+searchInput.value = bikeData[currentModelKey].name;
+render(currentModelKey);
+
+function getVoltageNumber(voltageStr) {
+  const match = voltageStr.match(/(\d+)V/);
+  return match ? match[1] : null;
+}
+
+function toggleMoreOptions() {
+  const panel = document.getElementById('moreOptionsPanel');
+  const btn = document.getElementById('viewMoreBtn');
+  const current = bikeData[currentModelKey];
+  const currentVoltNum = getVoltageNumber(current.voltage);
+
+  if (panel.style.display === 'block') {
+    panel.style.display = 'none';
+    btn.textContent = 'View more compatible batteries ▾';
+    return;
+  }
+
+  const sameFamily = Object.entries(bikeData)
+    .filter(([key, b]) => key !== currentModelKey && getVoltageNumber(b.voltage) === currentVoltNum)
+    .slice(0, 6);
+
+  if (sameFamily.length === 0) {
+    panel.innerHTML = `<div style="font-size:13px; color:var(--slate); padding:14px; text-align:center;">No other ${currentVoltNum}V models in the database yet — check back as we add more.</div>`;
+  } else {
+    panel.innerHTML = `<div style="font-size:12.5px; color:var(--slate); margin-bottom:12px;">Other ${currentVoltNum}V-family batteries from different models — always verify connector shape before buying:</div>` +
+      sameFamily.map(([key, b]) => `
+        <div class="compat-row" style="opacity:0.9;">
+          <div class="batt-icon"><img src="images/battery-pack.png" alt="Battery" style="width:100%;height:100%;object-fit:cover;border-radius:9px;"></div>
+          <div><div class="batt-name">${b.compatible[0].name}</div><div class="batt-sub">From: ${b.name}</div></div>
+          <div><div class="col-val">${b.compatible[0].v}</div><div class="col-lbl">Voltage</div></div>
+          <div><div class="col-val">${b.compatible[0].cap}</div><div class="col-lbl">Capacity</div></div>
+          <div><div class="col-val">${b.compatible[0].energy}</div><div class="col-lbl">Energy</div></div>
+          <div class="badge check">⚠ Cross-model — verify</div>
+          <button class="btn-view" onclick="selectModel('${key}'); window.scrollTo({top:document.getElementById('tool').offsetTop-20, behavior:'smooth'});">View This Model</button>
+          <div class="chevron">›</div>
+        </div>
+      `).join('');
+  }
+
+  panel.style.display = 'block';
+  btn.textContent = 'Hide extra options ▴';
+}
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.querySelector(`.nav-links a[href="#${id}"]`)?.classList.add('active');
+}
+function openContact() { document.getElementById('contactModal').classList.add('show'); }
+function closeContact() { document.getElementById('contactModal').classList.remove('show'); }
+document.getElementById('contactModal').addEventListener('click', (e) => {
+  if (e.target.id === 'contactModal') closeContact();
+});
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const body = document.body;
+  const btn = document.getElementById('themeToggle');
+  const isDark = body.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    body.removeAttribute('data-theme');
+    btn.textContent = '☀️';
+  } else {
+    body.setAttribute('data-theme', 'dark');
+    btn.textContent = '🌙';
+  }
+});
+
+// ⚠️ REPLACE THIS: paste your Formspree endpoint URL here once you have it
+// Example: "https://formspree.io/f/xyzabcde"
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xdeodkeg";
+
+async function sendContactForm() {
+  const name = document.getElementById('cName').value.trim();
+  const email = document.getElementById('cEmail').value.trim();
+  const message = document.getElementById('cMessage').value.trim();
+  const status = document.getElementById('cStatus');
+  const btn = document.getElementById('cSendBtn');
+
+  if (!name || !email || !message) {
+    status.style.display = 'block';
+    status.style.color = '#B8790E';
+    status.textContent = 'Please fill in all fields.';
+    return;
+  }
+
+  if (FORMSPREE_ENDPOINT.includes('PASTE_YOUR')) {
+    status.style.display = 'block';
+    status.style.color = '#B8790E';
+    status.textContent = 'Form not connected yet — add your Formspree URL in the code.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const res = await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ name, email, message })
+    });
+
+    if (res.ok) {
+      status.style.display = 'block';
+      status.style.color = '#1E6B4F';
+      status.textContent = 'Message sent — thank you!';
+      document.getElementById('cName').value = '';
+      document.getElementById('cEmail').value = '';
+      document.getElementById('cMessage').value = '';
+      setTimeout(closeContact, 1500);
+    } else {
+      throw new Error('Send failed');
+    }
+  } catch (err) {
+    status.style.display = 'block';
+    status.style.color = '#B8790E';
+    status.textContent = 'Something went wrong — please try again.';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Send Message';
+}
+
+const legalContent = {
+  privacy: {
+    title: "Privacy Policy",
+    html: `
+      <div class="legal-updated">Last updated: September 2026</div>
+      <h4>What this policy covers</h4>
+      <p>This Privacy Policy explains what information VoltMatch ("we", "us") collects when you use this website, and how that information is used.</p>
+      <h4>Information we collect</h4>
+      <p>VoltMatch does not require an account to use the battery lookup tool. We do not collect names, emails, or personal identifiers unless you voluntarily submit them through our Contact form.</p>
+      <ul>
+        <li><strong>Contact form data:</strong> If you submit the contact form, we collect the name, email, and message you provide, solely to respond to your inquiry.</li>
+        <li><strong>Usage analytics:</strong> We may use privacy-focused analytics tools (such as Google Analytics or similar) to understand aggregate traffic patterns — pages visited, approximate location by country/city, device type. This data is not tied to your identity.</li>
+        <li><strong>Cookies:</strong> If this site displays advertising (via Google AdSense) or uses analytics, cookies may be set by those third-party services. See "Third-party services" below.</li>
+      </ul>
+      <h4>Third-party services</h4>
+      <p>This site may use the following third-party services, each governed by their own privacy policies:</p>
+      <ul>
+        <li><strong>Google AdSense</strong> — may use cookies to serve relevant ads. You can opt out of personalized advertising via Google's Ads Settings.</li>
+        <li><strong>Amazon Associates</strong> — some battery links on this site are affiliate links. If you click through and make a purchase, Amazon may set its own cookies as part of its standard affiliate tracking. We do not control or access this data.</li>
+      </ul>
+      <h4>Your rights</h4>
+      <p>You may request that we delete any contact form data you've submitted by emailing us. You can also disable cookies in your browser settings at any time, though this may affect site functionality.</p>
+      <h4>Contact</h4>
+      <p>Questions about this policy can be sent via the Contact form on this site.</p>
+    `
+  },
+  terms: {
+    title: "Terms of Service",
+    html: `
+      <div class="legal-updated">Last updated: September 2026</div>
+      <h4>Acceptance of terms</h4>
+      <p>By using VoltMatch, you agree to these Terms of Service. If you do not agree, please do not use this site.</p>
+      <h4>What VoltMatch provides</h4>
+      <p>VoltMatch is an informational tool that displays publicly available battery voltage, capacity, and compatibility data for e-bike and electric scooter models. This information is compiled from manufacturer specifications and public comparison sources.</p>
+      <h4>No warranty on compatibility data — read this before buying a battery</h4>
+      <p>Battery specifications are safety-critical. While we cross-check data where possible, VoltMatch makes <strong>no guarantee of accuracy or completeness</strong> for any listed voltage, connector type, or compatibility claim. Battery and charger mismatches can cause fire, damage, or injury.</p>
+      <p><strong>Before purchasing any replacement battery, you must independently verify the voltage and connector type printed on your own device's charger or existing battery label.</strong> VoltMatch is a starting reference point, not a substitute for that verification.</p>
+      <h4>Limitation of liability</h4>
+      <p>VoltMatch, its operator, and contributors are not liable for any damage, injury, financial loss, or other harm arising from reliance on information provided on this site, including incorrect compatibility matches.</p>
+      <h4>Affiliate disclosure</h4>
+      <p>Some links on this site are Amazon Associate affiliate links. VoltMatch may earn a commission on qualifying purchases made through these links, at no additional cost to you.</p>
+      <h4>Acceptable use</h4>
+      <p>You agree not to scrape, republish, or misuse the content of this site without permission, and not to use this site for any unlawful purpose.</p>
+      <h4>Changes to these terms</h4>
+      <p>We may update these terms from time to time. Continued use of the site after changes constitutes acceptance of the revised terms.</p>
+    `
+  },
+  refund: {
+    title: "Refund Policy",
+    html: `
+      <div class="legal-updated">Last updated: September 2026</div>
+      <h4>VoltMatch does not sell products directly</h4>
+      <p>VoltMatch is a free informational tool. We do not process payments, sell batteries, or fulfill orders directly through this site.</p>
+      <h4>Purchases made through affiliate links</h4>
+      <p>Battery and charger links on this site may direct you to third-party retailers, including Amazon, via affiliate links. Any purchase you make on those platforms is a transaction between you and that retailer — <strong>not with VoltMatch.</strong></p>
+      <p>Refunds, returns, warranty claims, and order issues for any product purchased through an affiliate link must be handled directly with the retailer (e.g. Amazon's own return policy) or the product manufacturer.</p>
+      <h4>Contact form / paid services</h4>
+      <p>If VoltMatch introduces any paid services in the future (such as premium data access), a specific refund policy for that service will be published here at that time.</p>
+      <h4>Questions</h4>
+      <p>If you're unsure where to direct a refund or order issue, contact us via the Contact form and we'll point you in the right direction.</p>
+    `
+  }
+};
+
+function openLegal(key) {
+  const data = legalContent[key];
+  document.getElementById('legalTitle').textContent = data.title;
+  document.getElementById('legalBody').innerHTML = data.html;
+  document.getElementById('legalModal').classList.add('show');
+}
+function closeLegal() { document.getElementById('legalModal').classList.remove('show'); }
+document.getElementById('legalModal').addEventListener('click', (e) => {
+  if (e.target.id === 'legalModal') closeLegal();
+});
+</script>
+
+</body>
+</html>
